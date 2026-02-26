@@ -1,0 +1,101 @@
+# Description of what this change includes
+# Revision number
+# Date
+
+
+
+
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Deploy this stack in AWS Region us-west-2."
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: student
+    Description: Environment tag value (optional, helps with grading/organization).
+
+Resources:
+  StudentVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: VPC-jamger8290
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+  SubnetAz1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref StudentVPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs "us-west-2"]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: VPC-jamger8290-subnet-az1
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+  SubnetAz2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref StudentVPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select [1, !GetAZs "us-west-2"]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: VPC-jamger8290-subnet-az2
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+  SubnetAz3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref StudentVPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: !Select [2, !GetAZs "us-west-2"]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: VPC-jamger8290-subnet-az3
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+Outputs:
+  VpcId:
+    Description: The ID of the created VPC.
+    Value: !Ref StudentVPC
+
+  VpcNameTag:
+    Description: The VPC Name tag value.
+    Value: VPC-jamger8290
+
+  Subnet1Id:
+    Description: Subnet ID in AZ index 0 (us-west-2).
+    Value: !Ref SubnetAz1
+
+  Subnet2Id:
+    Description: Subnet ID in AZ index 1 (us-west-2).
+    Value: !Ref SubnetAz2
+
+  Subnet3Id:
+    Description: Subnet ID in AZ index 2 (us-west-2).
+    Value: !Ref SubnetAz3
+
+  SubnetIds:
+    Description: Comma-delimited list of all subnet IDs.
+    Value: !Join [",", [!Ref SubnetAz1, !Ref SubnetAz2, !Ref SubnetAz3]]
+
+  AvailabilityZonesUsed:
+    Description: Comma-delimited list of the Availability Zones used.
+    Value: !Join
+      - ","
+      - - !Select [0, !GetAZs "us-west-2"]
+        - !Select [1, !GetAZs "us-west-2"]
+        - !Select [2, !GetAZs "us-west-2"]
